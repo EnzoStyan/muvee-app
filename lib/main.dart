@@ -1,7 +1,52 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:http/http.dart' as http;
+import 'package:muvee_app/core/api_constants.dart';
+import 'dart:developer';
+import 'firebase_options.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  try {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+    log("✅ Firebase Core Initialized Successfully!"); // Menggunakan log
+
+    await fetchPopularMovies();
+
+  } catch (e) {
+    log("❌ Firebase Initialization Failed: $e");
+  }
   runApp(const MyApp());
+}
+
+Future<void> fetchPopularMovies() async {
+  final url = Uri.parse(
+      '${ApiConstants.BASE_URL}movie/popular?api_key=${ApiConstants.API_KEY}'
+  );
+
+  print("\n--- Starting TMDB Sanity Check ---");
+  try {
+    final response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      print('✅ TMDB Connection SUCCESS (Status 200).');
+      // Kamu bisa mencetak sedikit respons untuk memastikan data masuk
+      if (response.body.length > 200) {
+        print('Sample Data Received: ${response.body.substring(0, 200)}...');
+      } else {
+        print('Data Received: ${response.body}');
+      }
+    } else {
+      print('❌ TMDB Connection FAILED: Status code ${response.statusCode}');
+      print('Check API Key dan format URL-mu.');
+    }
+  } catch (e) {
+    print('❌ TMDB Connection ERROR: Network atau Exception: $e');
+  }
+  print("--- TMDB Sanity Check Finished ---\n");
 }
 
 class MyApp extends StatelessWidget {
