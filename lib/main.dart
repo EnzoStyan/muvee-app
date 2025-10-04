@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-// import 'package:http/http.dart' as http;
-// import 'package:muvee_app/core/api_constants.dart';
 import 'package:muvee_app/di/locator.dart';
 import 'dart:developer';
 import 'firebase_options.dart';
 import 'services/tmdb_services.dart';
 import 'theme/app_theme.dart';
+import 'package:provider/provider.dart';
+import 'di/locator.dart';
+import 'providers/movie_provider.dart';
+import 'repositories/movie_repositoy.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -23,7 +25,15 @@ void main() async {
   } catch (e) {
     log("❌ Firebase Initialization Failed: $e");
   }
-  runApp(const MyApp());
+  runApp(
+    MultiProvider(providers: [
+      ChangeNotifierProvider(
+          create: (context) => MovieProvider(locator<MovieRepository>()),
+      )
+    ],
+      child: const MyApp(),
+    ),
+  );
 }
 
 Future<void> testTmdbService() async {
