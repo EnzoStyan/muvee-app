@@ -1,6 +1,9 @@
+// lib/providers/movie_provider.dart
+
 import 'package:flutter/material.dart';
+import 'dart:developer';
 import '../models/movie_model.dart';
-import '../repositories/movie_repositoy.dart';
+import '../repositories/movie_repository.dart';
 
 enum ViewState { initial, loading, loaded, error }
 
@@ -18,7 +21,8 @@ class MovieProvider with ChangeNotifier {
   String get errorMessage => _errorMessage;
 
   Future<void> fetchTrendingMovies() async {
-    if (_trendingState == ViewState.loaded || _trendingState == ViewState.loading) return;
+    // Hindari request berulang jika sudah loaded
+    if (_trendingState == ViewState.loaded) return;
 
     _trendingState = ViewState.loading;
     notifyListeners();
@@ -27,13 +31,16 @@ class MovieProvider with ChangeNotifier {
       final movies = await _repository.getTrendingMovies();
 
       _trendingMovies = movies;
-      _trendingState = ViewState.error;
+      _trendingState = ViewState.loaded;
       _errorMessage = '';
-    } catch (e) {
-      _errorMessage = e.toString();
-      _trendingState = ViewState.error;
-      debugPrint('error fetching trending Movies: $e');
-    }
-  }
 
+    } catch (e) {
+      _trendingState = ViewState.error;
+      // Mengambil pesan error yang lebih jelas
+      _errorMessage = e.toString().contains(":") ? e.toString().split(':')[1].trim() : e.toString();
+      debugPrint('Error fetching trending movies: $_errorMessage');
+    }
+
+    notifyListeners();
+  }
 }

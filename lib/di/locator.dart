@@ -1,20 +1,21 @@
+// lib/di/locator.dart
+
 import 'package:get_it/get_it.dart';
-import '../services/tmdb_services.dart';
-import '../repositories/movie_repositoy.dart';
+import '../services/tmdb_service.dart';
+import '../repositories/movie_repository.dart';
 import '../services/auth_service.dart';
 
 final locator = GetIt.instance;
 
 void setupLocator() {
-  //Registering Service
+  // SERVICES
   locator.registerLazySingleton<TmdbService>(() => TmdbService());
-
-  // Registering Repo yang butuh service
-  locator.registerLazySingleton<MovieRepository>(
-      () =>  MovieRepository(locator<TmdbService>()),
-  );
-
   locator.registerLazySingleton<AuthService>(() => AuthService());
 
-  // ViewModels/Blocs/Cubit
+  // REPOSITORIES
+  locator.registerLazySingleton<MovieRepository>(
+        () => MovieRepository(locator<TmdbService>()),
+  );
+
+  // PROVIDERS (Akan diinisialisasi di MultiProvider)
 }

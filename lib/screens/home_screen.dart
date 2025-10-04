@@ -1,8 +1,10 @@
+// lib/screens/home_screen.dart
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/movie_provider.dart';
-import '../theme/app_colors.dart';
 import '../models/movie_model.dart';
+import '../theme/app_colors.dart';
 import '../widgets/hero_movie_section.dart';
 import '../widgets/movie_category_row.dart';
 
@@ -26,7 +28,7 @@ class HomeScreen extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsets.all(24.0),
                 child: Text(
-                  'Gagal memuat film: ${provider.errorMessage}. Cek koneksi atau API Key.',
+                  'Gagal memuat film: ${provider.errorMessage}. Cek koneksi atau API.',
                   style: const TextStyle(color: Colors.redAccent),
                   textAlign: TextAlign.center,
                 ),
@@ -44,33 +46,45 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-
   Widget _buildLoadedScreen(BuildContext context, List<MovieModel> movies) {
+    if (movies.isEmpty) {
+      return const Center(child: Text("Tidak ada film yang tersedia."));
+    }
+
+    final popularNow = movies.take(10).toList();
+    final trending = movies.skip(5).take(10).toList();
+    final topRated = movies.skip(15).toList();
+
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-
-          if (movies.isNotEmpty)
-            HeroMovieSection(movie: movies.first),
-
+          HeroMovieSection(movie: movies.first),
 
           const SizedBox(height: 20),
 
+          if (popularNow.isNotEmpty)
+            MovieCategoryRow(
+              title: "Popular Now",
+              movies: popularNow,
+            ),
 
-          MovieCategoryRow(
-            title: "Popular Now",
-            movies: movies,
-          ),
+          const SizedBox(height: 20),
 
-          // 3. Kategori Film Horizontal Kedua (Movies for You - Placeholder)
-          const SizedBox(height: 10),
-          MovieCategoryRow(
-            title: "Muvee Originals",
-            movies: movies.reversed.toList(), // Contoh: gunakan daftar terbalik
-          ),
+          if (trending.isNotEmpty)
+            MovieCategoryRow(
+              title: "Trending Movies",
+              movies: trending,
+            ),
 
-          // Tambahkan SizedBox untuk jarak agar Bottom Nav tidak terpotong
+          const SizedBox(height: 20),
+
+          if (topRated.isNotEmpty)
+            MovieCategoryRow(
+              title: "Muvee's Top Picks",
+              movies: topRated,
+            ),
+
           const SizedBox(height: 80),
         ],
       ),

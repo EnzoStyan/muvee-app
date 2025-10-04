@@ -5,10 +5,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  // Stream untuk memantau perubahan status autentikasi (Login/Logout)
   Stream<User?> get user => _auth.authStateChanges();
 
-  // Metode Registrasi
   Future<User?> signUp(String email, String password) async {
     try {
       final result = await _auth.createUserWithEmailAndPassword(
@@ -21,7 +19,6 @@ class AuthService {
     }
   }
 
-  // Metode Login
   Future<User?> signIn(String email, String password) async {
     try {
       final result = await _auth.signInWithEmailAndPassword(
@@ -34,7 +31,6 @@ class AuthService {
     }
   }
 
-  // Metode Logout
   Future<void> signOut() async {
     await _auth.signOut();
   }

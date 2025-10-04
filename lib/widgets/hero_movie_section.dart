@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import '../models/movie_model.dart';
 import '../core/api_constants.dart';
+import '../screens/movie_detail_screen.dart';
 import '../theme/app_colors.dart';
 
 class HeroMovieSection extends StatelessWidget {
@@ -70,7 +71,13 @@ class HeroMovieSection extends StatelessWidget {
               const SizedBox(width: 10),
               // Tombol Info/Detail
               OutlinedButton.icon(
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => MovieDetailScreen(movie: movie),
+                    ),
+                  );
+                },
                 icon: const Icon(Icons.info_outline, color: AppColors.textWhite),
                 label: const Text("Info", style: TextStyle(color: AppColors.textWhite)),
                 style: OutlinedButton.styleFrom(

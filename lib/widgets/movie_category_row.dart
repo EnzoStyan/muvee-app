@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/movie_model.dart';
 import '../core/api_constants.dart';
+import '../screens/movie_detail_screen.dart';
 
 class MovieCategoryRow extends StatelessWidget {
   final String title;
@@ -47,15 +48,17 @@ class MovieCategoryRow extends StatelessWidget {
   }
 
   Widget _buildPoster(BuildContext context, MovieModel movie) {
-    // Pastikan posterPath ada
     final posterUrl = movie.posterPath != null
         ? '${ApiConstants.BASE_IMAGE_URL}${movie.posterPath}'
         : null;
 
     return GestureDetector(
       onTap: () {
-        // TODO: Implementasi Navigasi ke Halaman Detail Film
-        debugPrint('Tapped on ${movie.title}');
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => MovieDetailScreen(movie: movie),
+          ),
+        );
       },
       child: Container(
         width: 130, // Lebar Poster

@@ -1,9 +1,12 @@
+// lib/screens/main_wrapper.dart
+
 import 'package:flutter/material.dart';
+import 'package:muvee_app/screens/search_screen.dart';
 import 'package:provider/provider.dart';
 import '../providers/movie_provider.dart';
 import '../theme/app_colors.dart';
 import 'home_screen.dart';
-import 'auth/login_screen.dart';
+import '../services/auth_service.dart'; // Untuk tombol Logout
 
 class MainWrapper extends StatefulWidget {
   const MainWrapper({super.key});
@@ -16,8 +19,8 @@ class _MainWrapperState extends State<MainWrapper> {
   int _currentIndex = 0;
 
   final List<Widget> _screens = [
-    const HomeScreen(), // Home Screen (dengan data film)
-    const Center(child: Text("Search Screen", style: TextStyle(color: AppColors.textWhite))),
+    const HomeScreen(), // INDEX 0
+    const SearchScreen(),
     const Center(child: Text("Downloads Screen", style: TextStyle(color: AppColors.textWhite))),
     const Center(child: Text("My List Screen", style: TextStyle(color: AppColors.textWhite))),
   ];
@@ -25,6 +28,7 @@ class _MainWrapperState extends State<MainWrapper> {
   @override
   void initState() {
     super.initState();
+    // Panggil data saat wrapper dimuat
     Future.microtask(() =>
         Provider.of<MovieProvider>(context, listen: false).fetchTrendingMovies()
     );
@@ -34,9 +38,16 @@ class _MainWrapperState extends State<MainWrapper> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Muvee', style: TextStyle(color: AppColors.accentYellow)),
+        title: Text('Muvee', style: TextStyle(color: AppColors.accentYellow)),
         actions: [
-          IconButton(onPressed: (){}, icon: Icon(Icons.cast, color: AppColors.textWhite,))
+          IconButton(onPressed: (){}, icon: Icon(Icons.cast, color: AppColors.textWhite)),
+          // Tombol Logout
+          IconButton(
+              onPressed: () {
+                Provider.of<AuthService>(context, listen: false).signOut();
+              },
+              icon: Icon(Icons.logout, color: AppColors.textWhite)
+          ),
         ],
       ),
 
@@ -49,7 +60,7 @@ class _MainWrapperState extends State<MainWrapper> {
             _currentIndex = index;
           });
         },
-          type: BottomNavigationBarType.fixed, // Penting untuk latar belakang dark
+        type: BottomNavigationBarType.fixed,
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Search'),

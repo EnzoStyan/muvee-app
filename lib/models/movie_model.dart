@@ -1,3 +1,5 @@
+// lib/models/movie_model.dart
+
 import 'package:json_annotation/json_annotation.dart';
 
 part 'movie_model.g.dart';
@@ -7,9 +9,8 @@ class MovieModel {
   final int id;
   final String title;
 
-  // TMDB menggunakan snake_case, kita gunakan @JsonKey untuk memetakannya
   @JsonKey(name: 'poster_path')
-  final String? posterPath; // Nullable karena terkadang poster hilang
+  final String? posterPath;
 
   @JsonKey(name: 'backdrop_path')
   final String? backdropPath;
@@ -20,12 +21,10 @@ class MovieModel {
   final String? releaseDate;
 
   @JsonKey(name: 'vote_average')
-  final double voteAverage;
+  final double? voteAverage; // Nullable
 
-  // Properti untuk mengetahui apakah itu konten dewasa
-  final bool adult;
+  final bool? adult; // Nullable
 
-  // Constructor
   MovieModel({
     required this.id,
     required this.title,
@@ -33,14 +32,12 @@ class MovieModel {
     this.backdropPath,
     required this.overview,
     this.releaseDate,
-    required this.voteAverage,
-    required this.adult,
+    this.voteAverage,
+    this.adult,
   });
 
-  // 3. Factory constructor untuk deserialisasi JSON
   factory MovieModel.fromJson(Map<String, dynamic> json) =>
       _$MovieModelFromJson(json);
 
-  // 4. Metode untuk serialisasi JSON (opsional, tapi berguna)
   Map<String, dynamic> toJson() => _$MovieModelToJson(this);
 }
