@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:http/http.dart' as http;
-import 'package:muvee_app/core/api_constants.dart';
+// import 'package:http/http.dart' as http;
+// import 'package:muvee_app/core/api_constants.dart';
+import 'package:muvee_app/di/locator.dart';
 import 'dart:developer';
 import 'firebase_options.dart';
+import 'services/tmdb_services.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -14,7 +16,8 @@ void main() async {
     );
     log("✅ Firebase Core Initialized Successfully!"); // Menggunakan log
 
-    await fetchPopularMovies();
+    setupLocator();
+    await testTmdbService();
 
   } catch (e) {
     log("❌ Firebase Initialization Failed: $e");
@@ -22,31 +25,21 @@ void main() async {
   runApp(const MyApp());
 }
 
-Future<void> fetchPopularMovies() async {
-  final url = Uri.parse(
-      '${ApiConstants.BASE_URL}movie/popular?api_key=${ApiConstants.API_KEY}'
-  );
-
-  print("\n--- Starting TMDB Sanity Check ---");
+Future<void> testTmdbService() async {
+  log("\n--- Starting TMDB Service Test ---");
   try {
-    final response = await http.get(url);
+    final service = TmdbService();
+    final movies = await service.getPopularMovies();
 
-    if (response.statusCode == 200) {
-      print('✅ TMDB Connection SUCCESS (Status 200).');
-      // Kamu bisa mencetak sedikit respons untuk memastikan data masuk
-      if (response.body.length > 200) {
-        print('Sample Data Received: ${response.body.substring(0, 200)}...');
-      } else {
-        print('Data Received: ${response.body}');
-      }
-    } else {
-      print('❌ TMDB Connection FAILED: Status code ${response.statusCode}');
-      print('Check API Key dan format URL-mu.');
-    }
+    log('✅ TMDB Service Test SUCCESS!');
+    log('Total Movies Received: ${movies.length}');
+    log('First Movie Title (Parsed Model): ${movies.first.title}');
+    log('First Movie Overview: ${movies.first.overview.substring(0, 50)}...');
+
   } catch (e) {
-    print('❌ TMDB Connection ERROR: Network atau Exception: $e');
+    log('❌ TMDB Service Test FAILED: $e');
   }
-  print("--- TMDB Sanity Check Finished ---\n");
+  log("--- TMDB Service Test Finished ---\n");
 }
 
 class MyApp extends StatelessWidget {
