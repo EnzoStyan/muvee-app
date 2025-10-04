@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../providers/movie_provider.dart';
 import '../theme/app_colors.dart';
 import 'home_screen.dart';
+import 'auth/login_screen.dart';
 
 class MainWrapper extends StatefulWidget {
   const MainWrapper({super.key});
