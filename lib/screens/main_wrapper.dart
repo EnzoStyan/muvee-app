@@ -1,6 +1,7 @@
 // lib/screens/main_wrapper.dart
 
 import 'package:flutter/material.dart';
+import 'package:muvee_app/screens/my_list_screen.dart';
 import 'package:muvee_app/screens/search_screen.dart';
 import 'package:provider/provider.dart';
 import '../providers/movie_provider.dart';
@@ -22,7 +23,7 @@ class _MainWrapperState extends State<MainWrapper> {
     const HomeScreen(), // INDEX 0
     const SearchScreen(),
     const Center(child: Text("Downloads Screen", style: TextStyle(color: AppColors.textWhite))),
-    const Center(child: Text("My List Screen", style: TextStyle(color: AppColors.textWhite))),
+    const MyListScreen(),
   ];
 
   @override

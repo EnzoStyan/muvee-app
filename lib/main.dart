@@ -14,6 +14,8 @@ import 'screens/auth/login_screen.dart';
 import 'screens/auth/signup_screen.dart';
 import 'services/tmdb_service.dart';
 import 'providers/search_provider.dart';
+import 'providers/my_list_provider.dart';
+import 'services/my_list_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -51,6 +53,10 @@ void main() async {
         ChangeNotifierProvider(
           create: (context) => SearchProvider(locator<MovieRepository>()),
         ),
+
+        ChangeNotifierProvider(
+          create: (context) => MyListProvider(locator<MyListService>()),
+        ),
       ],
       child: const MyApp(),
     ),
@@ -79,10 +85,12 @@ class AuthWrapper extends StatelessWidget {
   Widget build(BuildContext context) {
     final user = Provider.of<User?>(context);
 
+    final myListProvider = Provider.of<MyListProvider>(context, listen: false);
+    myListProvider.startListeningToMyList(user);
+
     if (user == null) {
       return const LoginScreen();
     } else {
-
       return const MainWrapper();
     }
   }

@@ -1,9 +1,11 @@
 // lib/screens/movie_detail_screen.dart
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../models/movie_model.dart';
 import '../core/api_constants.dart';
 import '../theme/app_colors.dart';
+import '../providers/my_list_provider.dart'; // Import provider My List
 
 class MovieDetailScreen extends StatelessWidget {
   final MovieModel movie;
@@ -25,6 +27,10 @@ class MovieDetailScreen extends StatelessWidget {
             expandedHeight: 400.0,
             pinned: true, // Biar AppBar tetap ada saat di-scroll
             backgroundColor: AppColors.primaryDark,
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back, color: AppColors.textWhite),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
             flexibleSpace: FlexibleSpaceBar(
               title: Text(
                 movie.title,
@@ -32,14 +38,32 @@ class MovieDetailScreen extends StatelessWidget {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
-              background: backdropUrl != null
-                  ? Image.network(
-                backdropUrl,
-                fit: BoxFit.cover,
-                // Tambahkan gradient di bawah gambar agar teks mudah dibaca
-                alignment: Alignment.topCenter,
-              )
-                  : Container(color: AppColors.bgGray),
+              background: Stack(
+                fit: StackFit.expand,
+                children: [
+                  backdropUrl != null
+                      ? Image.network(
+                    backdropUrl,
+                    fit: BoxFit.cover,
+                    alignment: Alignment.topCenter,
+                  )
+                      : Container(color: AppColors.bgGray),
+                  // Gradient Overlay untuk membuat teks mudah dibaca
+                  const DecoratedBox(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Colors.transparent,
+                          AppColors.primaryDark,
+                        ],
+                        stops: [0.6, 1.0],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
 
@@ -52,12 +76,13 @@ class MovieDetailScreen extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _buildRatingAndRelease(context),
+                      _buildRatingAndRelease(), // Tidak perlu context
                       const SizedBox(height: 20),
 
                       _buildActionButtons(context),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 30),
 
+                      // Sinopsis
                       Text(
                         'Sinopsis',
                         style: Theme.of(context).textTheme.headlineSmall!.copyWith(color: AppColors.textWhite),
@@ -69,9 +94,6 @@ class MovieDetailScreen extends StatelessWidget {
                         textAlign: TextAlign.justify,
                       ),
 
-                      // Placeholder untuk informasi tambahan
-                      const SizedBox(height: 40),
-                      const Text('Cast & Crew (TODO)'),
                       const SizedBox(height: 50),
                     ],
                   ),
@@ -85,45 +107,65 @@ class MovieDetailScreen extends StatelessWidget {
   }
 
   // Widget untuk Rating dan Tanggal Rilis
-  Widget _buildRatingAndRelease(BuildContext context) {
+  Widget _buildRatingAndRelease() {
     return Row(
       children: [
         const Icon(Icons.star_rate_rounded, color: AppColors.accentYellow, size: 24),
         const SizedBox(width: 4),
         Text(
+          // Penanganan null safety dengan operator ?? (Null Coalescing)
           '${(movie.voteAverage ?? 0.0).toStringAsFixed(1)}',
           style: const TextStyle(color: AppColors.textWhite, fontSize: 18, fontWeight: FontWeight.bold),
         ),
         const SizedBox(width: 15),
         Text(
-          movie.releaseDate != null ? movie.releaseDate!.split('-')[0] : 'TBA', // Ambil hanya tahun
+          // Ambil hanya tahun, jika null tampilkan 'TBA'
+          movie.releaseDate != null && movie.releaseDate!.isNotEmpty ? movie.releaseDate!.split('-')[0] : 'TBA',
           style: const TextStyle(color: AppColors.textLight, fontSize: 16),
         ),
       ],
     );
   }
 
-  // Widget untuk Tombol Aksi
+  // Widget untuk Tombol Aksi (Play dan Add to My List)
   Widget _buildActionButtons(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          child: ElevatedButton.icon(
-            onPressed: () { /* TODO: Implementasi Pemutar Video */ },
-            icon: const Icon(Icons.play_arrow),
-            label: const Text('Play', style: TextStyle(fontWeight: FontWeight.bold)),
-            style: ElevatedButton.styleFrom(
-              minimumSize: const Size.fromHeight(50),
+    // Gunakan Consumer untuk mendengarkan status MyListProvider
+    return Consumer<MyListProvider>(
+      builder: (context, myListProvider, child) {
+        final bool isAdded = myListProvider.isMovieInList(movie.id);
+
+        return Row(
+          children: [
+            Expanded(
+              child: ElevatedButton.icon(
+                onPressed: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text("Fitur Pemutar Video (TODO)")),
+                  );
+                },
+                icon: const Icon(Icons.play_arrow),
+                label: const Text('Play', style: TextStyle(fontWeight: FontWeight.bold)),
+                style: ElevatedButton.styleFrom(
+                  minimumSize: const Size.fromHeight(50),
+                ),
+              ),
             ),
-          ),
-        ),
-        const SizedBox(width: 10),
-        IconButton(
-          onPressed: () { /* TODO: Implementasi Tambah ke Daftar Saya (Firestore) */ },
-          icon: const Icon(Icons.add, color: AppColors.textWhite, size: 30),
-          tooltip: 'Tambah ke Daftar Saya',
-        ),
-      ],
+            const SizedBox(width: 10),
+            // Tombol Tambah/Hapus ke My List
+            IconButton(
+              onPressed: () {
+                myListProvider.toggleMyList(movie);
+              },
+              icon: Icon(
+                isAdded ? Icons.check : Icons.add, // Ganti ikon jika sudah ditambahkan
+                color: isAdded ? AppColors.accentYellow : AppColors.textWhite,
+                size: 30,
+              ),
+              tooltip: isAdded ? 'Hapus dari Daftar' : 'Tambah ke Daftar Saya',
+            ),
+          ],
+        );
+      },
     );
   }
 }
