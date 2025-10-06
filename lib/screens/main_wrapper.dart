@@ -7,7 +7,8 @@ import 'package:provider/provider.dart';
 import '../providers/movie_provider.dart';
 import '../theme/app_colors.dart';
 import 'home_screen.dart';
-import '../services/auth_service.dart'; // Untuk tombol Logout
+import '../services/auth_service.dart';
+import 'profile_screen.dart';
 
 class MainWrapper extends StatefulWidget {
   const MainWrapper({super.key});
@@ -24,6 +25,7 @@ class _MainWrapperState extends State<MainWrapper> {
     const SearchScreen(),
     const Center(child: Text("Downloads Screen", style: TextStyle(color: AppColors.textWhite))),
     const MyListScreen(),
+    const ProfileScreen()
   ];
 
   @override
@@ -67,6 +69,7 @@ class _MainWrapperState extends State<MainWrapper> {
           BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Search'),
           BottomNavigationBarItem(icon: Icon(Icons.file_download), label: 'Downloads'),
           BottomNavigationBarItem(icon: Icon(Icons.list), label: 'My List'),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
         ],
       ),
     );

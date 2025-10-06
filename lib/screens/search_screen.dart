@@ -67,7 +67,6 @@ class _SearchScreenState extends State<SearchScreen> {
                 title: Text(movie.title),
                 subtitle: Text(movie.releaseDate ?? ''),
                 onTap: () {
-                  // Navigasi ke Halaman Detail Film
                   Navigator.of(context).push(
                     MaterialPageRoute(builder: (context) => MovieDetailScreen(movie: movie)),
                   );

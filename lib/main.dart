@@ -78,9 +78,38 @@ Future<void> testTmdbService() async {
   log("--- TMDB Service Test Finished ---\n");
 }
 
-class AuthWrapper extends StatelessWidget {
+class AuthWrapper extends StatefulWidget {
   const AuthWrapper({super.key});
 
+  @override
+  State<AuthWrapper> createState() => _AuthWrapperState();
+}
+
+class _AuthWrapperState extends State<AuthWrapper> {
+  // Instance Provider
+  MyListProvider? _myListProvider;
+  User? _currentUser;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    // Ambil user dan provider tanpa listen: false untuk mendapatkan nilai terbaru
+    final newUser = Provider.of<User?>(context);
+    final provider = Provider.of<MyListProvider>(context, listen: false);
+
+    // ⭐️ LOGIKA UTAMA DI SINI ⭐️
+    // Panggil listener HANYA jika status user berubah
+    if (newUser != _currentUser) {
+      _currentUser = newUser;
+
+      // Panggil fungsi yang memicu notifyListeners() di sini
+      // Karena kita berada di didChangeDependencies, ini aman.
+      provider.startListeningToMyList(_currentUser);
+    }
+
+    _myListProvider = provider;
+  }
   @override
   Widget build(BuildContext context) {
     final user = Provider.of<User?>(context);
@@ -95,6 +124,7 @@ class AuthWrapper extends StatelessWidget {
     }
   }
 }
+
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});

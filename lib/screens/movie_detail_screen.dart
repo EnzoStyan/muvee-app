@@ -1,6 +1,7 @@
 // lib/screens/movie_detail_screen.dart
 
 import 'package:flutter/material.dart';
+import 'package:muvee_app/screens/video_player_screen.dart';
 import 'package:provider/provider.dart';
 import '../models/movie_model.dart';
 import '../core/api_constants.dart';
@@ -16,7 +17,8 @@ class MovieDetailScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     // Ambil URL gambar backdrop (latar belakang)
     final backdropUrl = movie.backdropPath != null
-        ? '${ApiConstants.BASE_IMAGE_URL}${movie.backdropPath}'
+    // Menggunakan URL baru, contoh: https://image.tmdb.org/t/p/w1280/...
+        ? 'https://image.tmdb.org/t/p/w1280${movie.backdropPath}'
         : null;
 
     return Scaffold(
@@ -139,8 +141,13 @@ class MovieDetailScreen extends StatelessWidget {
             Expanded(
               child: ElevatedButton.icon(
                 onPressed: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text("Fitur Pemutar Video (TODO)")),
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => VideoPlayerScreen(
+                        videoUrl: '',
+                        title: movie.title,
+                      ),
+                    ),
                   );
                 },
                 icon: const Icon(Icons.play_arrow),
